@@ -1,0 +1,60 @@
+
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>遗址数量图表</title>
+      <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.2/echarts.min.js"></script>
+    </head>
+
+    <body>
+      <div id="main" style="width: 100%; height: 600px;"></div>
+      <script>
+        // 初始化图表
+        const myChart = echarts.init(document.getElementById('main'));
+
+        const xAxisData = ['华侨管理区', '城区', '海丰县', '红海湾开发区', '陆丰市', '陆河县'];
+        const dataList = [[5, 60, 332, 35, 82, 103]];
+        const legendData = ['遗址数量'];
+
+        const option = {
+          tooltip: {
+            trigger: 'axis'
+          },
+          legend: {
+            data: legendData
+          },
+          dataZoom: [
+            {
+              type:'slider',
+              start: 50,
+              end: 70
+            },
+            {
+              type: 'inside',
+              start: 50,
+              end: 70
+            }
+          ],
+          xAxis: {
+            data: xAxisData
+          },
+          yAxis: {},
+          series: [
+            {
+              type: 'bar',
+              name: '遗址数量',
+              data: dataList[0]
+            }
+          ]
+        };
+
+        // 使用指定的配置项和数据显示图表。
+        myChart.setOption(option);
+      </script>
+    </body>
+
+    </html>
+    

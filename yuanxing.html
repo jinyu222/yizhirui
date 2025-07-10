@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>汕尾市革命遗址分布统计</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        #main {
+            width: 1000px;
+            height: 700px;
+            margin: 0 auto;
+        }
+        .download-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #1e90ff;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="main"></div>
+    <div class="download-btn" id="download">保存为图片</div>
+    <script>
+        // 初始化ECharts实例
+        var myChart = echarts.init(document.getElementById('main'));
+        
+        // 准备数据 - 按县区统计遗址数量
+        var countyData = {
+            '海丰县': {
+                '海城镇': 39,
+                '城东镇': 25,
+                '附城镇': 5,
+                '梅陇镇': 41,
+                '鲘门镇': 14,
+                '小漠镇': 1,
+                '赤石镇': 39,
+                '鹅埠镇': 4,
+                '联安镇': 21,
+                '可塘镇': 12,
+                '陶河镇': 19,
+                '赤坑镇': 17,
+                '大湖镇': 5,
+                '公平镇': 27,
+                '平东镇': 7,
+                '黄羌镇': 41,
+                '黄羌林场': 15
+            },
+            '陆丰市': {
+                '八万镇': 7,
+                '陂洋镇': 3,
+                '城东街道': 1,
+                '大安农场': 1,
+                '大安镇': 4,
+                '东海街道': 19,
+                '河东镇': 5,
+                '河西街道': 5,
+                '湖东镇': 3,
+                '甲东镇': 2,
+                '甲西镇': 1,
+                '甲子镇': 3,
+                '碣石镇': 3,
+                '金厢镇': 12,
+                '南塘镇': 2,
+                '桥冲镇': 2,
+                '上英镇': 1,
+                '潭西镇': 3,
+                '西南镇': 3,
+                '星都开发区': 1,
+                '博美镇': 1
+            },
+            '陆河县': {
+                '东坑镇': 11,
+                '河口镇': 33,
+                '河田镇': 9,
+                '螺溪镇': 5,
+                '南万镇': 4,
+                '上护镇': 3,
+                '水唇镇': 10,
+                '新田镇': 28
+            },
+            '城区': {
+                '东涌镇': 23,
+                '凤山街道': 13,
+                '红草镇': 8,
+                '捷胜镇': 9,
+                '香洲街道': 1,
+                '新港街道': 4,
+                '马宫街道': 2
+            },
+            '红海湾开发区': {
+                '东洲街道': 3,
+                '田墘街道': 22,
+                '遮浪街道': 8,
+                '副编': 2
+            },
+            '华侨管理区': {
+                '华侨管理区': 5
+            }
+        };
+        
+        // 准备图表数据
+        var counties = Object.keys(countyData);
+        var seriesData = [];
+        var pieData = [];
+        
+        // 计算每个县区的遗址总数
+        counties.forEach(function(county) {
+            var towns = countyData[county];
+            var total = 0;
+            for (var town in towns) {
+                total += towns[town];
+            }
+            pieData.push({
+                name: county,
+                value: total
+            });
+        });
+        
+        // 准备柱状图数据
+        var towns = [];
+        var townCounts = [];
+        
+        for (var county in countyData) {
+            for (var town in countyData[county]) {
+                towns.push(county + '-' + town);
+                townCounts.push(countyData[county][town]);
+            }
+        }
+        
+        // 设置图表选项
+        var option = {
+            title: {
+                text: '汕尾市革命遗址分布统计',
+                subtext: '数据来源：600+遗址.csv',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b}: {c} ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                data: counties
+            },
+            series: [
+                {
+                    name: '县区遗址总数',
+                    type: 'pie',
+                    radius: ['40%', '70%'],
+                    avoidLabelOverlap: false,
+                    itemStyle: {
+                        borderRadius: 10,
+                        borderColor: '#fff',
+                        borderWidth: 2
+                    },
+                    label: {
+                        show: false,
+                        position: 'center'
+                    },
+                    emphasis: {
+                        label: {
+                            show: true,
+                            fontSize: '18',
+                            fontWeight: 'bold'
+                        }
+                    },
+                    labelLine: {
+                        show: false
+                    },
+                    data: pieData,
+                    center: ['25%', '50%']
+                },
+                {
+                    name: '各乡镇遗址数量',
+                    type: 'bar',
+                    data: townCounts,
+                    label: {
+                        show: true,
+                        position: 'top',
+                        rotate: 90,
+                        align: 'left',
+                        verticalAlign: 'middle',
+                        fontSize: 9,
+                        formatter: function(params) {
+                            return towns[params.dataIndex];
+                        }
+                    },
+                    itemStyle: {
+                        color: function(params) {
+                            // 根据县区分配颜色
+                            var colorList = [
+                                '#c23531', '#2f4554', '#61a0a8', 
+                                '#d48265', '#91c7ae', '#749f83'
+                            ];
+                            var countyIndex = counties.indexOf(towns[params.dataIndex].split('-')[0]);
+                            return colorList[countyIndex % colorList.length];
+                        }
+                    },
+                    xAxisIndex: 1,
+                    yAxisIndex: 1
+                }
+            ],
+            grid: [
+                {
+                    right: '55%',
+                    top: '15%',
+                    bottom: '15%'
+                },
+                {
+                    left: '55%',
+                    top: '20%'
+                }
+            ],
+            xAxis: [
+                {
+                    gridIndex: 0,
+                    type: 'value',
+                    show: false
+                },
+                {
+                    gridIndex: 1,
+                    type: 'category',
+                    axisLabel: {
+                        show: false
+                    },
+                    axisTick: {
+                        show: false
+                    }
+                }
+            ],
+            yAxis: [
+                {
+                    gridIndex: 0,
+                    type: 'category',
+                    show: false
+                },
+                {
+                    gridIndex: 1,
+                    type: 'value',
+                    name: '遗址数量',
+                    nameLocation: 'middle',
+                    nameGap: 30
+                }
+            ]
+        };
+        
+        // 使用配置项显示图表
+        myChart.setOption(option);
+        
+        // 窗口大小改变时重新调整图表大小
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+        
+        // 点击下载按钮保存图片
+        document.getElementById('download').addEventListener('click', function() {
+            var url = myChart.getDataURL({
+                type: 'png',
+                pixelRatio: 2,
+                backgroundColor: '#fff'
+            });
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = '汕尾市革命遗址分布统计.png';
+            a.click();
+        });
+    </script>
+</body>
+</html>

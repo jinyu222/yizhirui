@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汕尾市革命遗址分布可视化</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        #container {
+            width: 100%;
+            height: 900px;
+        }
+        .title {
+            text-align: center;
+            font-family: "Microsoft YaHei", sans-serif;
+            margin: 20px 0;
+        }
+        .note {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .buttons {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 0 10px;
+            background-color: #5470c6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3a56b4;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">汕尾市革命遗址分布可视化</h1>
+    <p class="note">注：本图表展示汕尾市各区县每个镇/街道的代表性革命遗址</p>
+    <div class="buttons">
+        <button id="treemapBtn">矩形树图</button>
+        <button id="sunburstBtn">旭日图</button>
+        <button id="downloadBtn">保存为图片</button>
+    </div>
+    <div id="container"></div>
+
+    <script>
+        // 初始化图表
+        const chartDom = document.getElementById('container');
+        const myChart = echarts.init(chartDom);
+        
+        // 完整数据 - 每个镇/街道选取3-5个代表性遗址
+        const rawData = [
+            {
+                name: "海丰县",
+                children: [
+                    {
+                        name: "海城镇",
+                        value: 39,
+                        children: [
+                            {name: "红宫红场旧址", value: 1},
+                            {name: "彭湃烈士故居", value: 1},
+                            {name: "六人农会旧址", value: 1},
+                            {name: "海丰革命烈士陵园", value: 1}
+                        ]
+                    },
+                    {
+                        name: "城东镇",
+                        value: 25,
+                        children: [
+                            {name: "赤山约农会旧址", value: 1},
+                            {name: "海丰县总农会旧址", value: 1},
+                            {name: "海丰县革命烈士纪念碑", value: 1}
+                        ]
+                    },
+                    {
+                        name: "附城镇",
+                        value: 5,
+                        children: [
+                            {name: "海丰抗日民主县政府旧址", value: 1},
+                            {name: "大山脚农民自卫军队部旧址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "梅陇镇",
+                        value: 41,
+                        children: [
+                            {name: "丘东平故居", value: 1},
+                            {name: "孔子门战斗旧址", value: 1},
+                            {name: "梅陇革命烈士纪念碑", value: 1}
+                        ]
+                    },
+                    {
+                        name: "鲘门镇",
+                        value: 14,
+                        children: [
+                            {name: "鲘门苏维埃政权成立大会遗址", value: 1},
+                            {name: "东江纵队第六支队税站旧址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "小漠镇",
+                        value: 1,
+                        children: [
+                            {name: "小漠镇革命烈士纪念碑", value: 1}
+                        ]
+                    },
+                    {
+                        name: "赤石镇",
+                        value: 39,
+                        children: [
+                            {name: "赤石镇革命烈士纪念碑", value: 1},
+                            {name: "大安峒红军医院遗址", value: 1},
+                            {name: "红四师赤石战斗遗址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "鹅埠镇",
+                        value: 4,
+                        children: [
+                            {name: "鹅埠分区苏维埃政府旧址", value: 1},
+                            {name: "鹅埠农民自卫军兵工厂旧址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "联安镇",
+                        value: 21,
+                        children: [
+                            {name: "亚前彭农民学校旧址", value: 1},
+                            {name: "田心乡苏维埃政权旧址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "可塘镇",
+                        value: 12,
+                        children: [
+                            {name: "可塘镇凤山烈士墓", value: 1},
+                            {name: "红四师党代会旧址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "陶河镇",
+                        value: 19,
+                        children: [
+                            {name: "海陆丰人民自卫队首战战场遗址", value: 1},
+                            {name: "东江纵队六支队受降日军旧址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "赤坑镇",
+                        value: 17,
+                        children: [
+                            {name: "赤坑革命烈士纪念碑", value: 1},
+                            {name: "营救盟军飞行员遗址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "大湖镇",
+                        value: 5,
+                        children: [
+                            {name: "红四师渡海处旧址", value: 1},
+                            {name: "大德山红军洞", value: 1}
+                        ]
+                    },
+                    {
+                        name: "公平镇",
+                        value: 27,
+                        children: [
+                            {name: "杨其珊墓", value: 1},
+                            {name: "公平抗日阵亡将士纪念碑", value: 1}
+                        ]
+                    },
+                    {
+                        name: "平东镇",
+                        value: 7,
+                        children: [
+                            {name: "平东镇革命烈士纪念碑", value: 1},
+                            {name: "掩蔽柳亚子九龙峒旧址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "黄羌镇",
+                        value: 41,
+                        children: [
+                            {name: "七百勇士出征处", value: 1},
+                            {name: "黄羌革命烈士墓", value: 1},
+                            {name: "赵自选墓", value: 1}
+                        ]
+                    },
+                    {
+                        name: "黄羌林场",
+                        value: 15,
+                        children: [
+                            {name: "红二师纪念公园", value: 1},
+                            {name: "中共东江特委旧址", value: 1}
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "陆丰市",
+                children: [
+                    {
+                        name: "八万镇",
+                        value: 7,
+                        children: [
+                            {name: "王镜清烈士纪念碑", value: 1},
+                            {name: "革命烈士纪念碑", value: 1}
+                        ]
+                    },
+                    {
+                        name: "陂洋镇",
+                        value: 3,
+                        children: [
+                            {name: "墩仔山红军烈士纪念碑", value: 1},
+                            {name: "中共陆惠县委机关驻地旧址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "城东街道",
+                        value: 1,
+                        children: [
+                            {name: "炎苍埔村农会旧址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "大安镇",
+                        value: 4,
+                        children: [
+                            {name: "大安镇革命烈士纪念碑", value: 1},
+                            {name: "殉难革命战士墓", value: 1}
+                        ]
+                    },
+                    {
+                        name: "东海街道",
+                        value: 19,
+                        children: [
+                            {name: "陆丰革命烈士陵园", value: 1},
+                            {name: "张威纪念亭", value: 1},
+                            {name: "陆丰县苏维埃政府成立大会遗址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "碣石镇",
+                        value: 3,
+                        children: [
+                            {name: "红二师碣石作战指挥部旧址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "金厢镇",
+                        value: 12,
+                        children: [
+                            {name: "周恩来渡海处纪念碑", value: 1},
+                            {name: "红四师徐向前金厢渡海处纪念碑", value: 1}
+                        ]
+                    },
+                    {
+                        name: "南塘镇",
+                        value: 2,
+                        children: [
+                            {name: "南昌起义军领导人周恩来住宿旧址", value: 1}
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "陆河县",
+                children: [
+                    {
+                        name: "东坑镇",
+                        value: 11,
+                        children: [
+                            {name: "海陆丰人民自卫队东北大队活动纪念亭", value: 1},
+                            {name: "大溪乡农会遗址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "河口镇",
+                        value: 33,
+                        children: [
+                            {name: "河口革命烈士纪念碑", value: 1},
+                            {name: "谢非故居", value: 1},
+                            {name: "剑门坑农军战斗遗址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "河田镇",
+                        value: 9,
+                        children: [
+                            {name: "粤赣湘边纵队东一支司令部旧址", value: 1},
+                            {name: "陆河县'三一八'革命烈士墓园", value: 1}
+                        ]
+                    },
+                    {
+                        name: "螺溪镇",
+                        value: 5,
+                        children: [
+                            {name: "红二师无名烈士纪念园", value: 1},
+                            {name: "鸡爪地革命烈士纪念亭", value: 1}
+                        ]
+                    },
+                    {
+                        name: "新田镇",
+                        value: 28,
+                        children: [
+                            {name: "激石溪先烈纪念园", value: 1},
+                            {name: "红二师激石溪驻地遗址", value: 1},
+                            {name: "杨其珊牺牲地遗址", value: 1}
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "城区",
+                children: [
+                    {
+                        name: "东涌镇",
+                        value: 23,
+                        children: [
+                            {name: "东涌镇横岭山革命烈士纪念碑", value: 1},
+                            {name: "双英纪念碑", value: 1}
+                        ]
+                    },
+                    {
+                        name: "凤山街道",
+                        value: 13,
+                        children: [
+                            {name: "汕尾市城区革命烈士纪念碑", value: 1},
+                            {name: "曾生新编大队部汕尾联络站遗址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "红草镇",
+                        value: 8,
+                        children: [
+                            {name: "杨捷江烈士墓", value: 1},
+                            {name: "掩蔽柳亚子等胜昌大院旧址", value: 1}
+                        ]
+                    },
+                    {
+                        name: "捷胜镇",
+                        value: 9,
+                        children: [
+                            {name: "捷胜镇革命烈士纪念碑", value: 1},
+                            {name: "李劳工旧居", value: 1}
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "红海湾开发区",
+                children: [
+                    {
+                        name: "田墘街道",
+                        value: 22,
+                        children: [
+                            {name: "红海湾革命烈士陵园", value: 1},
+                            {name: "程子华等红四师将士渡海处", value: 1}
+                        ]
+                    },
+                    {
+                        name: "遮浪街道",
+                        value: 8,
+                        children: [
+                            {name: "南昌起义战士往香港渡海处", value: 1}
+                        ]
+                    }
+                ]
+            },
+            {
+                name: "华侨管理区",
+                children: [
+                    {
+                        name: "华侨管理区",
+                        value: 5,
+                        children: [
+                            {name: "华侨抗日斗争纪念室", value: 1},
+                            {name: "北坑村红四师指挥部遗址", value: 1}
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // 图表配置
+        const treemapOption = {
+            title: {
+                text: '汕尾市革命遗址分布(矩形树图)',
+                left: 'center',
+                top: 10
+            },
+            tooltip: {
+                formatter: function(info) {
+                    const value = info.value;
+                    const name = info.name;
+                    if(info.treePathInfo.length === 1) {
+                        return `${name}<br/>遗址总数: ${value}处`;
+                    } else if(info.treePathInfo.length === 2) {
+                        return `${name}<br/>所属区县: ${info.treePathInfo[0].name}<br/>遗址数量: ${value}处`;
+                    } else {
+                        return `${name}<br/>所属镇/街道: ${info.treePathInfo[1].name}`;
+                    }
+                }
+            },
+            series: [{
+                name: '遗址分布',
+                type: 'treemap',
+                visibleMin: 1,
+                data: rawData,
+                roam: false,
+                nodeClick: false,
+                breadcrumb: {
+                    show: true,
+                    left: 'center',
+                    top: 'bottom'
+                },
+                label: {
+                    show: true,
+                    formatter: '{b}'
+                },
+                levels: [
+                    {
+                        itemStyle: {
+                            borderColor: '#555',
+                            borderWidth: 4,
+                            gapWidth: 4
+                        }
+                    },
+                    {
+                        itemStyle: {
+                            borderColorSaturation: 0.7,
+                            gapWidth: 2,
+                            borderWidth: 2
+                        }
+                    },
+                    {
+                        colorSaturation: [0.35, 0.5],
+                        itemStyle: {
+                            gapWidth: 1,
+                            borderWidth: 1
+                        }
+                    }
+                ]
+            }]
+        };
+
+        const sunburstOption = {
+            title: {
+                text: '汕尾市革命遗址分布(旭日图)',
+                left: 'center',
+                top: 10
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: function(info) {
+                    const value = info.value;
+                    const name = info.name;
+                    if(info.treePathInfo.length === 1) {
+                        return `${name}<br/>遗址总数: ${value}处`;
+                    } else if(info.treePathInfo.length === 2) {
+                        return `${name}<br/>所属区县: ${info.treePathInfo[0].name}<br/>遗址数量: ${value}处`;
+                    } else {
+                        return `${name}<br/>所属镇/街道: ${info.treePathInfo[1].name}`;
+                    }
+                }
+            },
+            series: {
+                type: 'sunburst',
+                data: rawData,
+                radius: [0, '90%'],
+                label: {
+                    rotate: 'radial'
+                },
+                levels: [
+                    {},
+                    {
+                        r0: '15%',
+                        r: '45%',
+                        itemStyle: {
+                            borderWidth: 2
+                        },
+                        label: {
+                            rotate: 'tangential'
+                        }
+                    },
+                    {
+                        r0: '45%',
+                        r: '80%',
+                        label: {
+                            align: 'right'
+                        }
+                    },
+                    {
+                        r0: '80%',
+                        r: '90%',
+                        label: {
+                            position: 'outside',
+                            padding: 3,
+                            silent: false
+                        },
+                        itemStyle: {
+                            borderWidth: 3
+                        }
+                    }
+                ]
+            }
+        };
+
+        // 初始显示矩形树图
+        myChart.setOption(treemapOption);
+
+        // 按钮事件
+        document.getElementById('treemapBtn').addEventListener('click', function() {
+            myChart.setOption(treemapOption);
+        });
+
+        document.getElementById('sunburstBtn').addEventListener('click', function() {
+            myChart.setOption(sunburstOption);
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const url = myChart.getDataURL({
+                type: 'png',
+                pixelRatio: 2,
+                backgroundColor: '#fff'
+            });
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = '汕尾市革命遗址分布.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // 响应式调整
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+    </script>
+</body>
+</html>
