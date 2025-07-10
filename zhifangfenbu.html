@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>汕尾市革命遗址分布统计</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        #chart-container {
+            width: 100%;
+            height: 800px;
+        }
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">汕尾市革命遗址分布统计</h1>
+    <div id="chart-container"></div>
+    
+    <script>
+        // 数据处理 - 统计各县区的遗址数量
+        const countyData = {
+            "海丰县": {
+                "海城镇": 39,
+                "城东镇": 25,
+                "附城镇": 5,
+                "梅陇镇": 41,
+                "鲘门镇": 14,
+                "小漠镇": 1,
+                "赤石镇": 39,
+                "鹅埠镇": 4,
+                "联安镇": 21,
+                "可塘镇": 12,
+                "陶河镇": 19,
+                "赤坑镇": 17,
+                "大湖镇": 5,
+                "公平镇": 27,
+                "平东镇": 7,
+                "黄羌镇": 41,
+                "黄羌林场": 15
+            },
+            "陆丰市": {
+                "八万镇": 7,
+                "陂洋镇": 3,
+                "城东街道": 1,
+                "大安农场": 1,
+                "大安镇": 4,
+                "东海街道": 19,
+                "河东镇": 5,
+                "河西街道": 5,
+                "湖东镇": 3,
+                "甲东镇": 2,
+                "甲西镇": 1,
+                "甲子镇": 3,
+                "碣石镇": 3,
+                "金厢镇": 12,
+                "南塘镇": 2,
+                "桥冲镇": 2,
+                "上英镇": 1,
+                "潭西镇": 3,
+                "西南镇": 3,
+                "星都开发区": 1,
+                "博美镇": 1
+            },
+            "陆河县": {
+                "东坑镇": 11,
+                "河口镇": 33,
+                "河田镇": 9,
+                "螺溪镇": 5,
+                "南万镇": 4,
+                "上护镇": 3,
+                "水唇镇": 10,
+                "新田镇": 28
+            },
+            "城区": {
+                "东涌镇": 23,
+                "凤山街道": 13,
+                "红草镇": 8,
+                "捷胜镇": 9,
+                "香洲街道": 1,
+                "新港街道": 4,
+                "马宫街道": 2
+            },
+            "红海湾开发区": {
+                "东洲街道": 3,
+                "田墘街道": 22,
+                "遮浪街道": 8,
+                "副编": 2
+            },
+            "华侨管理区": {
+                "华侨管理区": 5
+            }
+        };
+
+        // 准备图表数据
+        const counties = Object.keys(countyData);
+        const seriesData = [];
+        const legendData = [];
+        
+        // 计算各县的总遗址数量
+        const countyTotals = counties.map(county => {
+            const towns = countyData[county];
+            return Object.values(towns).reduce((sum, num) => sum + num, 0);
+        });
+        
+        // 准备乡镇级数据
+        counties.forEach(county => {
+            const towns = countyData[county];
+            const townNames = Object.keys(towns);
+            const townCounts = Object.values(towns);
+            
+            seriesData.push({
+                name: county,
+                type: 'bar',
+                data: townCounts,
+                label: {
+                    show: true,
+                    position: 'top'
+                }
+            });
+            
+            legendData.push(county);
+        });
+
+        // 初始化图表
+        const chartDom = document.getElementById('chart-container');
+        const myChart = echarts.init(chartDom);
+        
+        const option = {
+            title: {
+                text: '各县区革命遗址数量分布',
+                subtext: '数据来源：汕尾市革命遗址普查',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                },
+                formatter: function(params) {
+                    let result = params[0].name + '<br/>';
+                    params.forEach(param => {
+                        result += param.seriesName + ': ' + param.value + '处<br/>';
+                    });
+                    return result;
+                }
+            },
+            legend: {
+                data: legendData,
+                top: 40
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: Object.keys(countyData[counties[0]]), // 使用海丰县的乡镇作为x轴
+                axisLabel: {
+                    interval: 0,
+                    rotate: 45
+                }
+            },
+            yAxis: {
+                type: 'value',
+                name: '遗址数量(处)'
+            },
+            series: seriesData,
+            dataZoom: [
+                {
+                    type: 'slider',
+                    show: true,
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 50
+                },
+                {
+                    type: 'inside',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 50
+                }
+            ],
+            toolbox: {
+                feature: {
+                    saveAsImage: {
+                        title: '保存为图片',
+                        pixelRatio: 2
+                    },
+                    dataView: {
+                        title: '数据视图',
+                        readOnly: true
+                    },
+                    magicType: {
+                        title: {
+                            line: '切换为折线图',
+                            bar: '切换为柱状图',
+                            stack: '堆叠'
+                        },
+                        type: ['line', 'bar', 'stack']
+                    },
+                    restore: {
+                        title: '还原'
+                    }
+                }
+            }
+        };
+
+        myChart.setOption(option);
+        
+        // 响应式调整
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+    </script>
+</body>
+</html>
