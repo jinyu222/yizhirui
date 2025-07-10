@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>汕尾市各区县人口变化(2000-2020)</title>
+    <!-- 使用国内可访问的CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        #chart-container {
+            width: 1000px;
+            height: 600px;
+            margin: 30px auto;
+        }
+        .title {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 20px;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        .download-btn {
+            display: block;
+            margin: 10px auto;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .download-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">汕尾市各区县人口变化(2000-2020)</div>
+    <button class="download-btn" onclick="downloadChart()">保存为图片</button>
+    <div id="chart-container"></div>
+
+    <script>
+        // 初始化图表
+        var chartDom = document.getElementById('chart-container');
+        var myChart = echarts.init(chartDom);
+        
+        // 准备数据
+        var years = ['2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020'];
+        
+        var option = {
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                },
+                formatter: function(params) {
+                    var result = params[0].axisValue + '<br/>';
+                    params.forEach(function(item) {
+                        result += item.marker + ' ' + item.seriesName + ': ' + item.value.toLocaleString() + '<br/>';
+                    });
+                    return result;
+                }
+            },
+            legend: {
+                data: ['城区', '海丰县', '陆丰市', '陆河县'],
+                top: 20
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true,
+                top: 80
+            },
+            xAxis: {
+                type: 'category',
+                data: years,
+                axisLabel: {
+                    rotate: 45,
+                    interval: 0
+                }
+            },
+            yAxis: {
+                type: 'value',
+                axisLabel: {
+                    formatter: function(value) {
+                        return (value / 10000).toFixed(0) + '万';
+                    }
+                },
+                name: '人口数'
+            },
+            series: [
+                {
+                    name: '城区',
+                    type: 'bar',
+                    data: [386358, 387989, 394262, 428762, 433690, 436184, 440343, 442752, 445565, 448478, 445531, 448076, 489882, 492195, 494429, 498733, 500936, 509476, 511468, 513290, 514372],
+                    itemStyle: {
+                        color: '#5470C6'
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    }
+                },
+                {
+                    name: '海丰县',
+                    type: 'bar',
+                    data: [661493, 660523, 648173, 648493, 655210, 658996, 665772, 670369, 674465, 678692, 674608, 684924, 803703, 807487, 811141, 818196, 821820, 819340, 822545, 825471, 828596],
+                    itemStyle: {
+                        color: '#91CC75'
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    }
+                },
+                {
+                    name: '陆丰市',
+                    type: 'bar',
+                    data: [1200054, 1224084, 1273273, 1313322, 1320745, 1328303, 1324691, 1334647, 1343576, 1352322, 1344133, 1334882, 1354267, 1360611, 1366852, 1378741, 1384855, 1396635, 1402084, 1407077, 1411266],
+                    itemStyle: {
+                        color: '#FAC858'
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    }
+                },
+                {
+                    name: '陆河县',
+                    type: 'bar',
+                    data: [150025, 141444, 124507, 135320, 138397, 139202, 146119, 145604, 146000, 146940, 146002, 155615, 294002, 295548, 296868, 299450, 300776, 303113, 304299, 305381, 306625],
+                    itemStyle: {
+                        color: '#EE6666'
+                    },
+                    emphasis: {
+                        focus: 'series'
+                    }
+                }
+            ],
+            dataZoom: [
+                {
+                    type: 'slider',
+                    show: true,
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                },
+                {
+                    type: 'inside',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                }
+            ]
+        };
+
+        // 使用配置项显示图表
+        myChart.setOption(option);
+        
+        // 响应窗口大小变化
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+        
+        // 保存图表为图片
+        function downloadChart() {
+            var url = myChart.getDataURL({
+                type: 'png',
+                pixelRatio: 2,
+                backgroundColor: '#fff'
+            });
+            var link = document.createElement('a');
+            link.href = url;
+            link.download = '汕尾市各区县人口变化(2000-2020).png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
